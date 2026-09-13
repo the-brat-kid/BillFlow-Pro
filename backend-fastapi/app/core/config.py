@@ -31,11 +31,26 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_ID: str = ""
     RAZORPAY_KEY_SECRET: str = ""
 
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS_DEFAULT: List[str] = [
         "http://localhost:3000",
         "https://vatsaai.com",
         "https://www.vatsaai.com",
     ]
+
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        """
+        Reads a raw comma-separated CORS_ORIGINS env var directly (not via
+        pydantic's JSON-list parsing, which would crash on a plain comma
+        string) so production domains can be set without touching code:
+        CORS_ORIGINS=https://myshop.com,https://www.myshop.com
+        Falls back to CORS_ORIGINS_DEFAULT above when unset.
+        """
+        import os
+        env_value = os.getenv("CORS_ORIGINS")
+        if env_value:
+            return [origin.strip() for origin in env_value.split(",") if origin.strip()]
+        return self.CORS_ORIGINS_DEFAULT
 
     class Config:
         case_sensitive = True

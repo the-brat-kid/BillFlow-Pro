@@ -1,0 +1,39 @@
+# Production deployment compose file.
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Differences from docker-compose.yml (dev):
+#   - Removes the ./backend-fastapi:/app bind mount so the container runs
+#     the code baked into the image, not whatever happens to be on the host.
+#   - Does not publish postgres/mongodb/redis ports to the host -- they're
+#     only reachable from other containers on the compose network, which
+#     is what you want once this is running on a real server.
+#   - restart: always instead of unless-stopped, since a production host
+#     rebooting should always bring the stack back up.
+#
+# Everything else (env vars, healthchecks, images) is inherited from
+# docker-compose.yml -- this file only overrides what needs to differ.
+
+services:
+  postgres:
+    restart: always
+    ports: []
+
+  mongodb:
+    restart: always
+    ports: []
+
+  redis:
+    restart: always
+    ports: []
+
+  backend-fastapi:
+    restart: always
+    volumes: []
+
+  backend-node:
+    restart: always
+
+  frontend:
+    restart: always
