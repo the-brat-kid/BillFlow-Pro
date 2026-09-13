@@ -1,0 +1,113 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: ["class"],
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+
+        // --- Stitch dashboard design tokens (namespaced to avoid collisions) ---
+        "stitch-outline-variant": "#464554",
+        "stitch-surface-container-highest": "#313540",
+        "stitch-surface-container-lowest": "#0a0e18",
+        "stitch-secondary-fixed": "#acedff",
+        "stitch-error-container": "#93000a",
+        "stitch-surface-container-high": "#262a35",
+        "stitch-on-tertiary-container": "#000703",
+        "stitch-on-primary-fixed": "#07006c",
+        "stitch-on-secondary-container": "#00424e",
+        "stitch-error": "#ffb4ab",
+        "stitch-primary-container": "#8083ff",
+        "stitch-surface-dim": "#0f131d",
+        "stitch-inverse-surface": "#dfe2f1",
+        "stitch-primary-fixed": "#e1e0ff",
+        "stitch-surface-variant": "#313540",
+        "stitch-surface-container-low": "#171b26",
+        "stitch-background": "#0f131d",
+        "stitch-primary-fixed-dim": "#c0c1ff",
+        "stitch-outline": "#908fa0",
+        "stitch-on-surface-variant": "#c7c4d7",
+        "stitch-on-error": "#690005",
+        "stitch-on-secondary": "#003640",
+        "stitch-on-primary-container": "#0d0096",
+        "stitch-tertiary": "#4edea3",
+        "stitch-inverse-on-surface": "#2c303b",
+        "stitch-on-background": "#dfe2f1",
+        "stitch-on-primary": "#1000a9",
+        "stitch-surface-container": "#1c1f2a",
+        "stitch-primary": "#c0c1ff",
+        "stitch-tertiary-container": "#00885d",
+        "stitch-on-tertiary": "#003824",
+        "stitch-secondary-container": "#03b5d3",
+        "stitch-secondary": "#4cd7f6",
+        "stitch-surface-bright": "#353944",
+        "stitch-surface": "#0f131d",
+        "stitch-on-error-container": "#ffdad6",
+      },
+      spacing: {
+        "space-xs": "0.5rem",
+        "space-xl": "2rem",
+        "layout-sidebar": "16rem",
+        "space-md": "1rem",
+        "space-3xl": "3rem",
+        "space-lg": "1.5rem",
+        "layout-header": "4rem",
+        "space-2xs": "0.25rem",
+        "gutter-default": "1.5rem",
+        "space-sm": "0.75rem",
+        "space-2xl": "2.5rem",
+      },
+      fontFamily: {
+        "stitch-body": ["var(--font-manrope)"],
+        "stitch-heading": ["var(--font-plus-jakarta)"],
+        "plus-jakarta": ["var(--font-plus-jakarta)"],
+        "mono-num": ["var(--font-jetbrains-mono)"],
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;

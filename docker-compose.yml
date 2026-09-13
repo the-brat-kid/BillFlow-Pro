@@ -1,0 +1,125 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: billflow
+      POSTGRES_PASSWORD: billflow_secret
+      POSTGRES_DB: billflow
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U billflow']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: billflow
+      MONGO_INITDB_ROOT_PASSWORD: billflow_secret
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-fastapi:
+    build:
+      context: ./backend-fastapi
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend-fastapi:/app
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://billflow:billflow_secret@postgres:5432/billflow
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_USER=billflow
+      - POSTGRES_PASSWORD=billflow_secret
+      - POSTGRES_DB=billflow
+      - POSTGRES_PORT=5432
+      - MONGODB_URL=mongodb://billflow:billflow_secret@mongodb:27017/billflow?authSource=admin
+      - REDIS_URL=redis://redis:6379/0
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  backend-node:
+    build:
+      context: ./backend-node
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://billflow:billflow_secret@mongodb:27017/billflow?authSource=admin
+      - MONGODB_URL=mongodb://billflow:billflow_secret@mongodb:27017/billflow?authSource=admin
+      - REDIS_URL=redis://redis:6379/0
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:3001}
+        - NEXT_PUBLIC_NODE_API_URL=${NEXT_PUBLIC_NODE_API_URL:-http://localhost:3001}
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    depends_on:
+      backend-fastapi:
+        condition: service_healthy
+      backend-node:
+        condition: service_healthy
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:3001}
+      - NEXT_PUBLIC_NODE_API_URL=${NEXT_PUBLIC_NODE_API_URL:-http://localhost:3001}
+
+volumes:
+  postgres_data:
+  mongo_data:
